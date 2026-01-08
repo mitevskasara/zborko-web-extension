@@ -1,0 +1,61 @@
+:root {
+  --tooltip-max-width: 320px;
+  --tooltip-padding-y: 16px;
+  --tooltip-padding-x: 18px;
+  --tooltip-border-radius: 6px;
+  --tooltip-line-height: 1.5;
+  --tooltip-z-index: 999999;
+
+  --tooltip-shadow-x: 0;
+  --tooltip-shadow-y: 16px;
+  --tooltip-shadow-blur: 32px;
+  --tooltip-shadow-color: rgba(0, 0, 0, 0.35);
+
+  --tooltip-border-width: 1px;
+  --tooltip-backdrop-blur: 6px;
+  --tooltip-transition: 0.18s ease-out;
+  --tooltip-scale: 1.03;
+
+  --tooltip-bg: #25282c;
+  --tooltip-text: rgb(211 212 213);
+  --tooltip-border-color: rgba(255, 255, 255, 0.12);
+  --tooltip-shadow-color: rgba(0, 0, 0, 0.35);
+}
+
+.word-explainer-tooltip {
+  display: none;
+  position: absolute;
+  max-width: var(--tooltip-max-width);
+  background: var(--tooltip-bg);
+  color: var(--tooltip-text);
+  padding: var(--tooltip-padding-y) var(--tooltip-padding-x);
+  border-radius: var(--tooltip-border-radius);
+  font-size: var(--tooltip-font-size);
+  line-height: var(--tooltip-line-height);
+  z-index: var(--tooltip-z-index);
+  box-shadow: var(--tooltip-shadow-x) var(--tooltip-shadow-y) var(--tooltip-shadow-blur)
+    var(--tooltip-shadow-color);
+  border: 1px solid var(--tooltip-border-color);
+  pointer-events: none;
+}
+
+.word-explainer-tooltip__word {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.word-explainer-tooltip__type {
+  font-size: 14px;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.word-explainer-tooltip__meaning {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.word-explainer-tooltip__example {
+  font-size: 14px;
+  font-style: italic;
+}
