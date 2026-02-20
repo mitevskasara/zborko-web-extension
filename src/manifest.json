@@ -3,14 +3,14 @@
   "name": "ЗборКО",
   "version": "1.2",
   "description": "Објаснување значење на зборови со селекција",
-  "permissions": ["storage"],
+  "permissions": ["storage", "tabs"],
   "background": {
     "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html"
   },
-  "host_permissions": ["https://api-inference.huggingface.co/*"],
+  "host_permissions": ["https://zborko-backend-v0.vercel.app/*"],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],

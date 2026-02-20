@@ -3,25 +3,179 @@
 <html>
   <head>
     <title>Word Pronouncer Settings</title>
+    <meta charset="utf-8" />
     <style>
-      body {
-        font-family: sans-serif;
-        padding: 15px;
-        width: 220px;
+      .popup {
+        font-family: Arial, sans-serif;
+        padding: 0.25rem;
+        width: 300px;
       }
-      button {
+
+      .popup__title {
+        font-size: 1.125rem;
+        margin: 0;
+        color: #101828;
+      }
+
+      .popup__subtitle {
+        margin: 5px 0 0;
+        color: #6a7282;
+        font-size: 0.875rem;
+      }
+
+      .popup__options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .popup__options__option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
-        margin: 10px 0;
-        padding: 8px;
+        gap: 16px;
+      }
+
+      .popup__options__option__label {
+        font-size: 0.875rem;
+        color: #101828;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .popup__options__option__sublabel {
+        font-size: 0.75rem;
+        color: #6a7282;
+        margin-bottom: 5px;
+        font-weight: normal;
+      }
+
+      .popup__divider {
+        border: none;
+        border-top: 1px solid #e4e6ef;
+        margin: 16px 0;
+      }
+
+      .popup__disabled-list {
+        padding: 0;
+        list-style: none;
+        margin-top: 12px;
+      }
+
+      .popup__disabled-list > li {
+        margin-bottom: 5px;
+        font-size: 0.875rem;
+        color: #6a7282;
+      }
+
+      .switch {
+        width: 50px;
+        max-width: 50px;
+        height: 18px;
+        position: relative;
+        display: inline-block;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 30px;
+        max-width: 30px;
+        background-color: #cbced4;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        border-radius: 34px;
+        border: 1px solid #030213;
+      }
+
+      .slider:before {
+        position: absolute;
+        content: '';
+        height: 14px;
+        width: 14px;
+        left: 0;
+        bottom: 1px;
+        background-color: white;
+        -webkit-transition: 0.4s;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .slider {
+        background-color: #030213;
+      }
+
+      input:not(:checked) + .slider {
+        border: 1px solid #cbced4;
+      }
+
+      input:focus + .slider {
+        box-shadow: 0 0 1px #030213;
+      }
+
+      input:checked + .slider:before {
+        -webkit-transform: translateX(14px);
+        -ms-transform: translateX(14px);
+        transform: translateX(14px);
       }
     </style>
   </head>
   <body>
-    <h3>Extension Settings</h3>
-    <button id="toggleSite">Turn off extension for this site</button>
-    <button id="toggleAll">Turn off extension for all sites</button>
-    <button id="enableAll">Turn on extension for all sites</button>
-
+    <div class="popup">
+      <h3 class="popup__title">Подесувања</h3>
+      <p class="popup__subtitle">Прилагоди преференци за екстензијата</p>
+      <hr class="popup__divider" />
+      <div class="popup__options">
+        <div class="popup__options__option">
+          <p class="popup__options__option__label">
+            Оваа страница
+            <br />
+            <span class="popup__options__option__sublabel"
+              >Вклучи/Исклучи објаснување на зборови само за оваа страница
+            </span>
+          </p>
+          <label class="switch">
+            <input type="checkbox" id="toggleSite" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="popup__options__option">
+          <p class="popup__options__option__label">
+            Глобално
+            <br />
+            <span class="popup__options__option__sublabel">
+              Вклучи/Исклучи објаснување на зборови глобално на сите страници
+            </span>
+          </p>
+          <label class="switch">
+            <input type="checkbox" id="toggleGlobal" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+      <hr class="popup__divider" />
+      <div class="popup__options__option">
+        <p class="popup__options__option__label">
+          Моментално исклучени страници
+          <br />
+          <span class="popup__options__option__sublabel"
+            >Објаснување на зборови е исклучено на следниве страници:
+          </span>
+        </p>
+      </div>
+      <ul id="disabledSites" class="popup__disabled-list"></ul>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>
