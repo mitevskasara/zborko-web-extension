@@ -118,6 +118,15 @@ If you add automated tests, document the command here and in `package.json`.
 Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and the
 [Code of Conduct](CODE_OF_CONDUCT.md) before opening an issue or pull request.
 
+## Privacy
+
+The extension sends only the single word you select to the configured API
+endpoint to look up its definition. Your per-site and global preferences,
+including the hostnames of sites where you disabled explanations, are stored with
+`browser.storage.sync`, which syncs across your signed-in Firefox profiles.
+
+See the [privacy policy](https://zborko.vercel.app/privacy) for details.
+
 ## License
 
 Released under the [ISC License](LICENSE).

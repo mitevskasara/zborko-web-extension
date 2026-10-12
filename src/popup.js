@@ -84,23 +84,6 @@ async function removeSite(site) {
 
   await browser.storage.sync.set({ disabledSites: updatedSites });
 
-  apiUrlInput.addEventListener('change', async () => {
-    const value = apiUrlInput.value.trim();
-
-    let url;
-    try {
-      url = new URL(value);
-    } catch {
-      apiUrlInput.value = DEFAULT_API_URL;
-      await browser.storage.sync.set({ apiUrl: DEFAULT_API_URL });
-      return;
-    }
-
-    const apiUrl = url.toString();
-    apiUrlInput.value = apiUrl;
-    await browser.storage.sync.set({ apiUrl });
-  });
-
   await renderState();
 }
 
@@ -127,6 +110,23 @@ async function toggleSite() {
 }
 
 toggleSiteBtn.addEventListener('click', toggleSite);
+
+apiUrlInput.addEventListener('change', async () => {
+  const value = apiUrlInput.value.trim();
+
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    apiUrlInput.value = DEFAULT_API_URL;
+    await browser.storage.sync.set({ apiUrl: DEFAULT_API_URL });
+    return;
+  }
+
+  const apiUrl = url.toString();
+  apiUrlInput.value = apiUrl;
+  await browser.storage.sync.set({ apiUrl });
+});
 
 disabledSites.addEventListener('click', (e) => {
   const removeBtn = e.target.closest('.popup__disabled-list__remove');
