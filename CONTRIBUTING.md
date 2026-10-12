@@ -23,13 +23,13 @@ By participating you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
    ```bash
    npm install
    ```
-3. Load the extension in Chrome:
-   - Go to `chrome://extensions`.
-   - Enable **Developer mode**.
-   - Click **Load unpacked** and select the `src/` directory.
+3. Load the extension in Firefox:
+   - Go to `about:debugging#/runtime/this-firefox`.
+   - Click **Load Temporary Add-on…**.
+   - Select the `src/manifest.json` file.
 
-The source lives in `src/`. After editing, click the reload icon for the
-extension on `chrome://extensions` and refresh the target page.
+The source lives in `src/`. After editing, click **Reload** for the extension on
+`about:debugging` and refresh the target page.
 
 ## Code style
 

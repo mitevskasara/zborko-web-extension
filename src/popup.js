@@ -6,7 +6,7 @@ const apiUrlInput = document.getElementById('apiUrl');
 const DEFAULT_API_URL = 'https://zborko.vercel.app/api/words';
 
 async function getCurrentTab() {
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
   return tab;
 }
 
@@ -19,28 +19,31 @@ async function getCurrentSite() {
 async function renderState() {
   const site = await getCurrentSite();
 
-  chrome.storage.sync.get(
-    { disabledGlobally: false, disabledSites: [], apiUrl: DEFAULT_API_URL },
-    ({ disabledGlobally, disabledSites: sites, apiUrl }) => {
-      toggleGlobalBtn.textContent = disabledGlobally ? 'Turn ON globally' : 'Turn OFF globally';
+  const {
+    disabledGlobally,
+    disabledSites: sites,
+    apiUrl,
+  } = await browser.storage.sync.get({
+    disabledGlobally: false,
+    disabledSites: [],
+    apiUrl: DEFAULT_API_URL,
+  });
 
-      apiUrlInput.value = apiUrl;
+  toggleGlobalBtn.textContent = disabledGlobally ? 'Turn ON globally' : 'Turn OFF globally';
 
-      renderDisabledSites(sites);
+  apiUrlInput.value = apiUrl;
 
-      if (!site) {
-        return;
-      }
+  renderDisabledSites(sites);
 
-      const isSiteDisabled = sites.includes(site);
-      toggleSiteBtn.textContent = isSiteDisabled
-        ? 'Turn ON for this site'
-        : 'Turn OFF for this site';
+  if (!site) {
+    return;
+  }
 
-      toggleSiteBtn.checked = !isSiteDisabled;
-      toggleGlobalBtn.checked = !disabledGlobally;
-    }
-  );
+  const isSiteDisabled = sites.includes(site);
+  toggleSiteBtn.textContent = isSiteDisabled ? 'Turn ON for this site' : 'Turn OFF for this site';
+
+  toggleSiteBtn.checked = !isSiteDisabled;
+  toggleGlobalBtn.checked = !disabledGlobally;
 }
 
 function renderDisabledSites(sites) {
@@ -75,31 +78,30 @@ function renderDisabledSites(sites) {
   });
 }
 
-function removeSite(site) {
-  chrome.storage.sync.get({ disabledSites: [] }, ({ disabledSites: sites }) => {
-    const updatedSites = sites.filter((s) => s !== site);
+async function removeSite(site) {
+  const { disabledSites: sites } = await browser.storage.sync.get({ disabledSites: [] });
+  const updatedSites = sites.filter((s) => s !== site);
 
-    chrome.storage.sync.set({ disabledSites: updatedSites }, () => {
-      apiUrlInput.addEventListener('change', () => {
-        const value = apiUrlInput.value.trim();
+  await browser.storage.sync.set({ disabledSites: updatedSites });
 
-        let url;
-        try {
-          url = new URL(value);
-        } catch {
-          apiUrlInput.value = DEFAULT_API_URL;
-          chrome.storage.sync.set({ apiUrl: DEFAULT_API_URL });
-          return;
-        }
+  apiUrlInput.addEventListener('change', async () => {
+    const value = apiUrlInput.value.trim();
 
-        const apiUrl = url.toString();
-        apiUrlInput.value = apiUrl;
-        chrome.storage.sync.set({ apiUrl });
-      });
+    let url;
+    try {
+      url = new URL(value);
+    } catch {
+      apiUrlInput.value = DEFAULT_API_URL;
+      await browser.storage.sync.set({ apiUrl: DEFAULT_API_URL });
+      return;
+    }
 
-      renderState();
-    });
+    const apiUrl = url.toString();
+    apiUrlInput.value = apiUrl;
+    await browser.storage.sync.set({ apiUrl });
   });
+
+  await renderState();
 }
 
 async function toggleSite() {
@@ -108,20 +110,20 @@ async function toggleSite() {
 
   const tab = await getCurrentTab();
 
-  chrome.storage.sync.get({ disabledSites: [] }, ({ disabledSites: sites }) => {
-    let updatedSites;
+  const { disabledSites: sites } = await browser.storage.sync.get({ disabledSites: [] });
 
-    if (sites.includes(site)) {
-      updatedSites = sites.filter((s) => s !== site);
-    } else {
-      updatedSites = [...sites, site];
-    }
+  let updatedSites;
 
-    chrome.storage.sync.set({ disabledSites: updatedSites }, () => {
-      renderDisabledSites(updatedSites);
-      chrome.tabs.sendMessage(tab.id, { type: 'SETTINGS_UPDATED' });
-    });
-  });
+  if (sites.includes(site)) {
+    updatedSites = sites.filter((s) => s !== site);
+  } else {
+    updatedSites = [...sites, site];
+  }
+
+  await browser.storage.sync.set({ disabledSites: updatedSites });
+
+  renderDisabledSites(updatedSites);
+  browser.tabs.sendMessage(tab.id, { type: 'SETTINGS_UPDATED' }).catch(() => {});
 }
 
 toggleSiteBtn.addEventListener('click', toggleSite);
@@ -136,15 +138,11 @@ disabledSites.addEventListener('click', (e) => {
 toggleGlobalBtn.addEventListener('click', async () => {
   const tab = await getCurrentTab();
 
-  chrome.storage.sync.get(
-    { disabledGlobally: false, disabledSites: [] },
-    async ({ disabledGlobally }) => {
-      const newState = !disabledGlobally;
-      chrome.storage.sync.set({ disabledGlobally: newState }, () => {
-        chrome.tabs.sendMessage(tab.id, { type: 'SETTINGS_UPDATED' });
-      });
-    }
-  );
+  const { disabledGlobally } = await browser.storage.sync.get({ disabledGlobally: false });
+
+  const newState = !disabledGlobally;
+  await browser.storage.sync.set({ disabledGlobally: newState });
+  browser.tabs.sendMessage(tab.id, { type: 'SETTINGS_UPDATED' }).catch(() => {});
 });
 
 renderState();

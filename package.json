@@ -1,9 +1,9 @@
 {
   "name": "zborko-web-extension",
   "version": "1.2.0",
-  "description": "Chrome extension that explains the meaning of Macedonian words selected on any web page.",
+  "description": "Firefox extension that explains the meaning of Macedonian words selected on any web page.",
   "keywords": [
-    "chrome-extension",
+    "firefox-extension",
     "manifest-v3",
     "macedonian",
     "dictionary",

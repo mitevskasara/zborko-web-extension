@@ -1,6 +1,6 @@
 # ЗБОРко (Zborko)
 
-A Chrome extension (Manifest V3) that explains the meaning of Macedonian words.
+A Firefox extension (Manifest V3) that explains the meaning of Macedonian words.
 Select a single Macedonian word on any web page and a tooltip appears with its
 definition, part of speech, gender, and usage examples.
 
@@ -26,12 +26,13 @@ definition, part of speech, gender, and usage examples.
    ```bash
    git clone https://github.com/mitevskasara/zborko-web-extension.git
    ```
-2. Open Chrome and go to `chrome://extensions`.
-3. Enable **Developer mode** (top-right).
-4. Click **Load unpacked** and select the `src/` directory.
+2. Open Firefox and go to `about:debugging#/runtime/this-firefox`.
+3. Click **Load Temporary Add-on…**.
+4. Select the `src/manifest.json` file.
 
-The extension is now active. Reload the extension from `chrome://extensions`
-after making code changes.
+The extension is now active. Reload it from `about:debugging` after making code
+changes. Temporary add-ons are removed when Firefox restarts, so reload it again
+after restarting the browser.
 
 ## Usage
 
@@ -46,7 +47,7 @@ after making code changes.
 
 ## Configuration
 
-Settings are stored with `chrome.storage.sync` under these keys:
+Settings are stored with `browser.storage.sync` under these keys:
 
 | Key                | Type       | Default                               | Description                                |
 | ------------------ | ---------- | ------------------------------------- | ------------------------------------------ |
@@ -82,7 +83,7 @@ To use a custom endpoint:
    ```
 2. Set the URL in the popup's **API endpoint** field.
 
-> Chrome only allows network requests to origins listed in `host_permissions`,
+> Firefox only allows network requests to origins listed in `host_permissions`,
 > so a custom endpoint will not work until its origin is added there.
 
 ## Project structure
@@ -91,7 +92,7 @@ To use a custom endpoint:
 .
 ├── src/
 │   ├── manifest.json     # Extension manifest (MV3)
-│   ├── background.js     # Service worker; performs API requests
+│   ├── background.js     # Background script; performs API requests
 │   ├── index.js          # Content script; selection handling + tooltip UI
 │   ├── index.css         # Tooltip styles (injected into pages)
 │   ├── popup.html        # Popup markup and styles

@@ -1,37 +1,38 @@
 const DEFAULT_API_URL = 'https://zborko.vercel.app/api/words';
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request) => {
   if (request.type !== 'EXPLAIN_WORD') return;
 
-  chrome.storage.sync.get({ apiUrl: DEFAULT_API_URL }, ({ apiUrl }) => {
+  return (async () => {
+    const { apiUrl } = await browser.storage.sync.get({ apiUrl: DEFAULT_API_URL });
+
     let url;
 
     try {
       url = new URL(apiUrl);
     } catch {
-      sendResponse({ data: null });
-      return;
+      return { data: null };
     }
 
     url.searchParams.set('zbor', request.word);
 
-    fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        sendResponse({
-          word: data.zbor,
-          type: data.vid,
-          gender: data.rod,
-          explanation: data.znacenje,
-        });
-      })
-      .catch(() => sendResponse({ data: null }));
-  });
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
 
-  return true;
+      return {
+        word: data.zbor,
+        type: data.vid,
+        gender: data.rod,
+        explanation: data.znacenje,
+      };
+    } catch {
+      return { data: null };
+    }
+  })();
 });

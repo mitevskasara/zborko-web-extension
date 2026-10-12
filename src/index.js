@@ -28,16 +28,13 @@ let settings = {
   disabledSites: [],
 };
 
-function loadSettings() {
-  chrome.storage.sync.get(settings, (stored) => {
-    if (chrome.runtime.lastError) return;
-    settings = stored;
-  });
+async function loadSettings() {
+  settings = await browser.storage.sync.get(settings);
 }
 
 loadSettings();
 
-chrome.storage.onChanged.addListener((changes) => {
+browser.storage.onChanged.addListener((changes) => {
   if (changes.disabledGlobally) {
     settings.disabledGlobally = changes.disabledGlobally.newValue;
   }
@@ -226,29 +223,21 @@ const showTooltip = (response, rect) => {
 
 createTooltip();
 
-const explain = (word) => {
-  if (cache.has(word)) return Promise.resolve(cache.get(word));
+const explain = async (word) => {
+  if (cache.has(word)) return cache.get(word);
 
-  return new Promise((resolve) => {
-    try {
-      chrome.runtime.sendMessage({ type: 'EXPLAIN_WORD', word }, (response) => {
-        if (chrome.runtime.lastError) {
-          resolve(null);
-          return;
-        }
+  try {
+    const response = await browser.runtime.sendMessage({ type: 'EXPLAIN_WORD', word });
 
-        if (!response?.word) {
-          resolve(null);
-          return;
-        }
-
-        cache.set(word, response);
-        resolve(response);
-      });
-    } catch (err) {
-      resolve(null);
+    if (!response?.word) {
+      return null;
     }
-  });
+
+    cache.set(word, response);
+    return response;
+  } catch {
+    return null;
+  }
 };
 
 document.addEventListener('mouseup', async (e) => {

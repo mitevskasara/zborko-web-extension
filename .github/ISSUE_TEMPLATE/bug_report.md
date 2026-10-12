@@ -23,7 +23,7 @@ If applicable, add screenshots to help explain the problem.
 
 **Environment**
 
-- Chrome version: [e.g. 120]
+- Firefox version: [e.g. 128]
 - Extension version: [e.g. 1.2.0]
 - OS: [e.g. macOS 14]
 - Page URL (if relevant):

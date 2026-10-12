@@ -5,7 +5,13 @@
   "description": "Објаснување значење на зборови со селекција",
   "permissions": ["storage", "tabs"],
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "zborko@mitevskasara.github.io",
+      "strict_min_version": "109.0"
+    }
   },
   "action": {
     "default_popup": "popup.html",
