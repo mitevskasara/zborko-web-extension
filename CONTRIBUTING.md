@@ -1,4 +1,4 @@
-# Contributing to ЗборКО
+# Contributing to ЗБОРко
 
 Thanks for your interest in improving the extension! This document explains how to
 get set up and how to submit changes.

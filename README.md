@@ -1,4 +1,4 @@
-# ЗборКО (Zborko)
+# ЗБОРко (Zborko)
 
 A Chrome extension (Manifest V3) that explains the meaning of Macedonian words.
 Select a single Macedonian word on any web page and a tooltip appears with its
@@ -18,7 +18,7 @@ definition, part of speech, gender, and usage examples.
 
 ## Demo
 
-> Add a screenshot or short GIF here. A good place is `docs/demo.gif`.
+![ЗБОРко (Zborko)](docs/zborko_cover.png)
 
 ## Installation (development)
 
