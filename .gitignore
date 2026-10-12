@@ -1,5 +1,27 @@
-node_modules
-dist
-build
+# Dependencies
+node_modules/
 
-.history
+# Build output
+dist/
+build/
+
+# Editor history / IDE files
+.history/
+.vscode/
+.idea/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test / coverage output
+coverage/

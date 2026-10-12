@@ -2,7 +2,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Word Pronouncer Settings</title>
+    <title>ЗборКО — Подесувања</title>
     <meta charset="utf-8" />
     <style>
       .popup {
@@ -37,6 +37,27 @@
         gap: 16px;
       }
 
+      .popup__options__option--column {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+      }
+
+      .popup__input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 6px 10px;
+        font-size: 0.8125rem;
+        color: #101828;
+        border: 1px solid #cbced4;
+        border-radius: 6px;
+        outline: none;
+      }
+
+      .popup__input:focus {
+        border-color: #030213;
+      }
+
       .popup__options__option__label {
         font-size: 0.875rem;
         color: #101828;
@@ -67,6 +88,52 @@
         margin-bottom: 5px;
         font-size: 0.875rem;
         color: #6a7282;
+      }
+
+      .popup__disabled-list__item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .popup__disabled-list__site {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .popup__disabled-list__remove {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.875rem;
+        line-height: 1;
+        color: #6a7282;
+        background: none;
+        border: 1px solid #cbced4;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+
+      .popup__disabled-list__remove:hover {
+        color: #101828;
+        border-color: #030213;
+      }
+
+      .popup__disabled-list__remove:focus-visible {
+        outline: 1px solid #030213;
+        outline-offset: 1px;
+      }
+
+      .popup__disabled-list__empty {
+        color: #cbced4;
+        font-style: italic;
       }
 
       .switch {
@@ -163,6 +230,23 @@
             <span class="slider"></span>
           </label>
         </div>
+      </div>
+      <hr class="popup__divider" />
+      <div class="popup__options__option popup__options__option--column">
+        <p class="popup__options__option__label">
+          API endpoint
+          <br />
+          <span class="popup__options__option__sublabel">
+            Адреса на API за објаснување на зборови
+          </span>
+        </p>
+        <input
+          type="url"
+          id="apiUrl"
+          class="popup__input"
+          placeholder="https://zborko.vercel.app/api/words"
+          spellcheck="false"
+        />
       </div>
       <hr class="popup__divider" />
       <div class="popup__options__option">

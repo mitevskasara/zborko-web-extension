@@ -1,5 +1,27 @@
 const cache = new Map();
 let tooltip;
+let latestRequestId = 0;
+
+const MAX_EXAMPLES = 3;
+
+const MACEDONIAN_LETTERS = new Set([
+  ...'АБВГДЃЕЖЗЅИЈКЛЉМНЊОПРСТЌУФХЦЧЏШ',
+  ...'абвгдѓежзѕијклљмнњопрстќуфхцчџш',
+]);
+
+const isMacedonianWord = (word) => {
+  let hasLetter = false;
+
+  for (const char of word) {
+    if (!/\p{L}/u.test(char)) continue;
+
+    if (!MACEDONIAN_LETTERS.has(char)) return false;
+
+    hasLetter = true;
+  }
+
+  return hasLetter;
+};
 
 let settings = {
   disabledGlobally: false,
@@ -26,12 +48,87 @@ chrome.storage.onChanged.addListener((changes) => {
 
 const createTooltip = () => {
   tooltip = document.createElement('div');
-  tooltip.className = 'word-explainer-tooltip';
   document.body.appendChild(tooltip);
 };
 
 const hideTooltip = () => {
+  latestRequestId++;
   tooltip.style.display = 'none';
+};
+
+const renderTooltip = (rect) => {
+  tooltip.style.display = 'block';
+  tooltip.style.visibility = 'hidden';
+
+  const margin = 8;
+  const tooltipRect = tooltip.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+
+  let top = rect.top + window.scrollY - tooltipRect.height - margin;
+  let left = rect.left + window.scrollX;
+
+  if (rect.top - tooltipRect.height - margin < 0) {
+    top = rect.bottom + window.scrollY + margin;
+  }
+
+  if (left + tooltipRect.width > viewportWidth) {
+    left = viewportWidth - tooltipRect.width - margin;
+  }
+
+  if (left < margin) left = margin;
+
+  tooltip.style.left = `${left}px`;
+  tooltip.style.top = `${top}px`;
+  tooltip.style.visibility = 'visible';
+};
+
+const startStatusTooltip = (word) => {
+  tooltip.innerHTML = '';
+  tooltip.className = 'word-tooltip word-tooltip--status';
+
+  const bar = document.createElement('div');
+  bar.className = 'word-tooltip__bar';
+
+  const content = document.createElement('div');
+  content.className = 'word-tooltip__content';
+
+  const wordEl = document.createElement('div');
+  wordEl.className = 'word-tooltip__word word-tooltip__word--compact';
+  wordEl.textContent = word;
+
+  tooltip.append(bar, content);
+
+  return { content, wordEl };
+};
+
+const showLoader = (word, rect) => {
+  const { content, wordEl } = startStatusTooltip(word);
+
+  const status = document.createElement('div');
+  status.className = 'word-tooltip__status';
+
+  const spinner = document.createElement('span');
+  spinner.className = 'word-tooltip__spinner';
+
+  const label = document.createElement('span');
+  label.textContent = 'Се бара...';
+
+  status.append(spinner, label);
+  content.append(wordEl, status);
+
+  renderTooltip(rect);
+};
+
+const showNotFound = (word, rect) => {
+  const { content, wordEl } = startStatusTooltip(word);
+
+  const message = document.createElement('div');
+  message.className = 'word-tooltip__message';
+  message.textContent = 'Не е пронајдено објаснување за овој збор.';
+
+  content.append(wordEl, message);
+
+  renderTooltip(rect);
 };
 
 const showTooltip = (response, rect) => {
@@ -94,7 +191,12 @@ const showTooltip = (response, rect) => {
 
   section.append(label, meaning);
 
-  if (example) {
+  const lines = (Array.isArray(example) ? example : String(example).split(','))
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .slice(0, MAX_EXAMPLES);
+
+  if (lines.length) {
     const exampleWrap = document.createElement('div');
     exampleWrap.className = 'word-tooltip__example';
 
@@ -106,51 +208,20 @@ const showTooltip = (response, rect) => {
     exText.style.fontStyle = 'italic';
     exText.style.color = '#52525b';
 
-    const lines = Array.isArray(example) ? example : String(example).split(',');
-
-    lines
-      .map((l) => l.trim())
-      .filter(Boolean)
-      .forEach((line) => {
-        const lineEl = document.createElement('div');
-        lineEl.textContent = `„${line}“`;
-        exText.appendChild(lineEl);
-      });
+    lines.forEach((line) => {
+      const lineEl = document.createElement('div');
+      lineEl.textContent = `„${line}“`;
+      exText.appendChild(lineEl);
+    });
 
     exampleWrap.append(exLabel, exText);
     section.appendChild(exampleWrap);
   }
 
-  // const footer = document.createElement('div');
-  // footer.className = 'word-tooltip__footer';
-  // footer.textContent = 'Клик за копирање';
-
   content.append(word, meta, section);
   tooltip.append(bar, content);
 
-  tooltip.style.display = 'block';
-  tooltip.style.visibility = 'hidden';
-
-  const margin = 8;
-  const tooltipRect = tooltip.getBoundingClientRect();
-  const viewportWidth = window.innerWidth;
-
-  let top = rect.top + window.scrollY - tooltipRect.height - margin;
-  let left = rect.left + window.scrollX;
-
-  if (rect.top - tooltipRect.height - margin < 0) {
-    top = rect.bottom + window.scrollY + margin;
-  }
-
-  if (left + tooltipRect.width > viewportWidth) {
-    left = viewportWidth - tooltipRect.width - margin;
-  }
-
-  if (left < margin) left = margin;
-
-  tooltip.style.left = `${left}px`;
-  tooltip.style.top = `${top}px`;
-  tooltip.style.visibility = 'visible';
+  renderTooltip(rect);
 };
 
 createTooltip();
@@ -182,13 +253,13 @@ const explain = (word) => {
 
 document.addEventListener('mouseup', async (e) => {
   try {
-    if (e.target.closest('.word-extension-root')) return;
+    if (e.target.closest('.word-tooltip')) return;
 
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed) return;
 
     const word = selection.toString().trim();
-    if (!word || word.split(/\s+/).length !== 1) {
+    if (!word || word.split(/\s+/).length !== 1 || !isMacedonianWord(word)) {
       hideTooltip();
       return;
     }
@@ -199,8 +270,23 @@ document.addEventListener('mouseup', async (e) => {
     }
 
     const rect = selection.getRangeAt(0).getBoundingClientRect();
+
+    const cached = cache.get(word);
+    if (cached) {
+      showTooltip(cached, rect);
+      return;
+    }
+
+    const requestId = ++latestRequestId;
+    showLoader(word, rect);
+
     const response = await explain(word);
-    if (!response) return;
+    if (requestId !== latestRequestId) return;
+
+    if (!response) {
+      showNotFound(word, rect);
+      return;
+    }
 
     showTooltip(response, rect);
   } catch {}
