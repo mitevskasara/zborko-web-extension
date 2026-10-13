@@ -47,13 +47,16 @@ after restarting the browser.
 
 ## Configuration
 
-Settings are stored with `browser.storage.sync` under these keys:
+Settings are stored under these keys. `disabledGlobally` and `apiUrl` use
+`browser.storage.sync` (synced across your signed-in Firefox profiles);
+`disabledSites` uses `browser.storage.local` so the list of visited hostnames
+never leaves the device:
 
-| Key                | Type       | Default                               | Description                                |
-| ------------------ | ---------- | ------------------------------------- | ------------------------------------------ |
-| `disabledGlobally` | `boolean`  | `false`                               | Disables the extension on all sites.       |
-| `disabledSites`    | `string[]` | `[]`                                  | Hostnames where explanations are disabled. |
-| `apiUrl`           | `string`   | `https://zborko.vercel.app/api/words` | Backend endpoint used to look up words.    |
+| Key                | Area                    | Type       | Default                               | Description                                |
+| ------------------ | ----------------------- | ---------- | ------------------------------------- | ------------------------------------------ |
+| `disabledGlobally` | `browser.storage.sync`  | `boolean`  | `false`                               | Disables the extension on all sites.       |
+| `disabledSites`    | `browser.storage.local` | `string[]` | `[]`                                  | Hostnames where explanations are disabled. |
+| `apiUrl`           | `browser.storage.sync`  | `string`   | `https://zborko.vercel.app/api/words` | Backend endpoint used to look up words.    |
 
 ### Using your own backend
 
@@ -121,9 +124,10 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and th
 ## Privacy
 
 The extension sends only the single word you select to the configured API
-endpoint to look up its definition. Your per-site and global preferences,
-including the hostnames of sites where you disabled explanations, are stored with
-`browser.storage.sync`, which syncs across your signed-in Firefox profiles.
+endpoint to look up its definition. Your global and endpoint preferences use
+`browser.storage.sync`, which syncs across your signed-in Firefox profiles. The
+list of sites where you disabled explanations is kept in `browser.storage.local`
+and never leaves your device.
 
 See the [privacy policy](https://zborko.vercel.app/privacy) for details.
 

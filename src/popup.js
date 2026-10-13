@@ -19,15 +19,10 @@ async function getCurrentSite() {
 async function renderState() {
   const site = await getCurrentSite();
 
-  const {
-    disabledGlobally,
-    disabledSites: sites,
-    apiUrl,
-  } = await browser.storage.sync.get({
-    disabledGlobally: false,
-    disabledSites: [],
-    apiUrl: DEFAULT_API_URL,
-  });
+  const [{ disabledGlobally, apiUrl }, { disabledSites: sites }] = await Promise.all([
+    browser.storage.sync.get({ disabledGlobally: false, apiUrl: DEFAULT_API_URL }),
+    browser.storage.local.get({ disabledSites: [] }),
+  ]);
 
   toggleGlobalBtn.textContent = disabledGlobally ? 'Turn ON globally' : 'Turn OFF globally';
 
@@ -79,10 +74,10 @@ function renderDisabledSites(sites) {
 }
 
 async function removeSite(site) {
-  const { disabledSites: sites } = await browser.storage.sync.get({ disabledSites: [] });
+  const { disabledSites: sites } = await browser.storage.local.get({ disabledSites: [] });
   const updatedSites = sites.filter((s) => s !== site);
 
-  await browser.storage.sync.set({ disabledSites: updatedSites });
+  await browser.storage.local.set({ disabledSites: updatedSites });
 
   await renderState();
 }
@@ -93,7 +88,7 @@ async function toggleSite() {
 
   const tab = await getCurrentTab();
 
-  const { disabledSites: sites } = await browser.storage.sync.get({ disabledSites: [] });
+  const { disabledSites: sites } = await browser.storage.local.get({ disabledSites: [] });
 
   let updatedSites;
 
@@ -103,7 +98,7 @@ async function toggleSite() {
     updatedSites = [...sites, site];
   }
 
-  await browser.storage.sync.set({ disabledSites: updatedSites });
+  await browser.storage.local.set({ disabledSites: updatedSites });
 
   renderDisabledSites(updatedSites);
   browser.tabs.sendMessage(tab.id, { type: 'SETTINGS_UPDATED' }).catch(() => {});

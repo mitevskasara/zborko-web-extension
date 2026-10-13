@@ -29,7 +29,12 @@ let settings = {
 };
 
 async function loadSettings() {
-  settings = await browser.storage.sync.get(settings);
+  const [{ disabledGlobally }, { disabledSites }] = await Promise.all([
+    browser.storage.sync.get({ disabledGlobally: false }),
+    browser.storage.local.get({ disabledSites: [] }),
+  ]);
+
+  settings = { disabledGlobally, disabledSites };
 }
 
 loadSettings();
