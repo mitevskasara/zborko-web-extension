@@ -11,7 +11,6 @@ definition, part of speech, gender, and usage examples.
   to three usage examples.
 - **Per-site and global toggle** — turn explanations off everywhere, or only on
   specific sites, from the extension popup.
-- **Configurable API endpoint** — point the extension at your own backend.
 - **In-memory cache** — repeated lookups on a page are instant.
 - **Macedonian-aware** — only triggers for words written in the Macedonian
   Cyrillic alphabet.
@@ -42,25 +41,24 @@ after restarting the browser.
 4. Click the extension icon to:
    - turn explanations on/off for the current site,
    - turn them on/off globally,
-   - remove sites from the disabled list,
-   - configure the API endpoint.
+   - remove sites from the disabled list.
 
 ## Configuration
 
-Settings are stored under these keys. `disabledGlobally` and `apiUrl` use
+Settings are stored under these keys. `disabledGlobally` uses
 `browser.storage.sync` (synced across your signed-in Firefox profiles);
 `disabledSites` uses `browser.storage.local` so the list of visited hostnames
 never leaves the device:
 
-| Key                | Area                    | Type       | Default                               | Description                                |
-| ------------------ | ----------------------- | ---------- | ------------------------------------- | ------------------------------------------ |
-| `disabledGlobally` | `browser.storage.sync`  | `boolean`  | `false`                               | Disables the extension on all sites.       |
-| `disabledSites`    | `browser.storage.local` | `string[]` | `[]`                                  | Hostnames where explanations are disabled. |
-| `apiUrl`           | `browser.storage.sync`  | `string`   | `https://zborko.vercel.app/api/words` | Backend endpoint used to look up words.    |
+| Key                | Area                    | Type       | Default | Description                                |
+| ------------------ | ----------------------- | ---------- | ------- | ------------------------------------------ |
+| `disabledGlobally` | `browser.storage.sync`  | `boolean`  | `false` | Disables the extension on all sites.       |
+| `disabledSites`    | `browser.storage.local` | `string[]` | `[]`    | Hostnames where explanations are disabled. |
 
-### Using your own backend
+## API
 
-The extension sends a `GET` request and expects a JSON response like:
+The extension sends a `GET` request to
+`https://zborko.vercel.app/api/words?zbor=<word>` and expects a JSON response like:
 
 ```json
 {
@@ -78,17 +76,6 @@ The extension sends a `GET` request and expects a JSON response like:
 | `rod`      | Grammatical gender.                   |
 | `znacenje` | Definition, optionally with examples. |
 
-To use a custom endpoint:
-
-1. Add its origin to `host_permissions` in `src/manifest.json`, for example:
-   ```json
-   "host_permissions": ["https://zborko.vercel.app/*", "https://your-api.example.com/*"]
-   ```
-2. Set the URL in the popup's **API endpoint** field.
-
-> Firefox only allows network requests to origins listed in `host_permissions`,
-> so a custom endpoint will not work until its origin is added there.
-
 ## Project structure
 
 ```
@@ -99,7 +86,7 @@ To use a custom endpoint:
 │   ├── index.js          # Content script; selection handling + tooltip UI
 │   ├── index.css         # Tooltip styles (injected into pages)
 │   ├── popup.html        # Popup markup and styles
-│   ├── popup.js          # Popup logic (settings + API endpoint)
+│   ├── popup.js          # Popup logic (settings)
 │   └── icons/            # Extension icons (16/32/48/128 px)
 └── logo.svg              # Source logo
 ```
@@ -123,11 +110,10 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and th
 
 ## Privacy
 
-The extension sends only the single word you select to the configured API
-endpoint to look up its definition. Your global and endpoint preferences use
-`browser.storage.sync`, which syncs across your signed-in Firefox profiles. The
-list of sites where you disabled explanations is kept in `browser.storage.local`
-and never leaves your device.
+The extension sends only the single word you select to the API endpoint to look
+up its definition. Your global preferences use `browser.storage.sync`, which syncs
+across your signed-in Firefox profiles. The list of sites where you disabled
+explanations is kept in `browser.storage.local` and never leaves your device.
 
 See the [privacy policy](https://zborko.vercel.app/privacy) for details.
 

@@ -1,9 +1,6 @@
 const toggleSiteBtn = document.getElementById('toggleSite');
 const toggleGlobalBtn = document.getElementById('toggleGlobal');
 const disabledSites = document.getElementById('disabledSites');
-const apiUrlInput = document.getElementById('apiUrl');
-
-const DEFAULT_API_URL = 'https://zborko.vercel.app/api/words';
 
 async function getCurrentTab() {
   const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
@@ -19,14 +16,12 @@ async function getCurrentSite() {
 async function renderState() {
   const site = await getCurrentSite();
 
-  const [{ disabledGlobally, apiUrl }, { disabledSites: sites }] = await Promise.all([
-    browser.storage.sync.get({ disabledGlobally: false, apiUrl: DEFAULT_API_URL }),
+  const [{ disabledGlobally }, { disabledSites: sites }] = await Promise.all([
+    browser.storage.sync.get({ disabledGlobally: false }),
     browser.storage.local.get({ disabledSites: [] }),
   ]);
 
   toggleGlobalBtn.textContent = disabledGlobally ? 'Turn ON globally' : 'Turn OFF globally';
-
-  apiUrlInput.value = apiUrl;
 
   renderDisabledSites(sites);
 
@@ -105,23 +100,6 @@ async function toggleSite() {
 }
 
 toggleSiteBtn.addEventListener('click', toggleSite);
-
-apiUrlInput.addEventListener('change', async () => {
-  const value = apiUrlInput.value.trim();
-
-  let url;
-  try {
-    url = new URL(value);
-  } catch {
-    apiUrlInput.value = DEFAULT_API_URL;
-    await browser.storage.sync.set({ apiUrl: DEFAULT_API_URL });
-    return;
-  }
-
-  const apiUrl = url.toString();
-  apiUrlInput.value = apiUrl;
-  await browser.storage.sync.set({ apiUrl });
-});
 
 disabledSites.addEventListener('click', (e) => {
   const removeBtn = e.target.closest('.popup__disabled-list__remove');
