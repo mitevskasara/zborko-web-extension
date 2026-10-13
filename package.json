@@ -21,7 +21,9 @@
   },
   "scripts": {
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "build": "npm run build:chrome",
+    "build:chrome": "npx --yes web-ext build --source-dir=src --artifacts-dir=dist --overwrite-dest --filename='zborko-chrome-{version}.zip'"
   },
   "devDependencies": {
     "prettier": "^3.7.4"
