@@ -1,9 +1,6 @@
 const toggleSiteBtn = document.getElementById('toggleSite');
 const toggleGlobalBtn = document.getElementById('toggleGlobal');
 const disabledSites = document.getElementById('disabledSites');
-const apiUrlInput = document.getElementById('apiUrl');
-
-const DEFAULT_API_URL = 'https://zborko.vercel.app/api/words';
 
 async function getCurrentTab() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -20,11 +17,9 @@ async function renderState() {
   const site = await getCurrentSite();
 
   chrome.storage.sync.get(
-    { disabledGlobally: false, disabledSites: [], apiUrl: DEFAULT_API_URL },
-    ({ disabledGlobally, disabledSites: sites, apiUrl }) => {
+    { disabledGlobally: false, disabledSites: [] },
+    ({ disabledGlobally, disabledSites: sites }) => {
       toggleGlobalBtn.textContent = disabledGlobally ? 'Turn ON globally' : 'Turn OFF globally';
-
-      apiUrlInput.value = apiUrl;
 
       renderDisabledSites(sites);
 
@@ -80,23 +75,6 @@ function removeSite(site) {
     const updatedSites = sites.filter((s) => s !== site);
 
     chrome.storage.sync.set({ disabledSites: updatedSites }, () => {
-      apiUrlInput.addEventListener('change', () => {
-        const value = apiUrlInput.value.trim();
-
-        let url;
-        try {
-          url = new URL(value);
-        } catch {
-          apiUrlInput.value = DEFAULT_API_URL;
-          chrome.storage.sync.set({ apiUrl: DEFAULT_API_URL });
-          return;
-        }
-
-        const apiUrl = url.toString();
-        apiUrlInput.value = apiUrl;
-        chrome.storage.sync.set({ apiUrl });
-      });
-
       renderState();
     });
   });
